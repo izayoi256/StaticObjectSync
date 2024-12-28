@@ -1,0 +1,21 @@
+{
+  "name": "red.qwert.staticobjectsync",
+  "displayName": "StaticObjectSync",
+  "version": "0.0.1",
+  "description": "A tool for synchronizing static objects with less continuous syncing",
+  "dependencies": {},
+  "gitDependencies": {},
+  "vpmDependencies": {
+    "com.vrchat.worlds": "3.7.4"
+  },
+  "author": {
+    "name": "Qwert",
+    "email": "qwert.izayoi@gmail.com",
+    "url": "https://github.com/izayoi256/"
+  },
+  "legacyFolders": {
+    "Assets\\Qwert\\StaticObjectSync": ""
+  },
+  "legacyFiles": {},
+  "unity": "2022.3"
+}

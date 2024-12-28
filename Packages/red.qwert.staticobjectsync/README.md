@@ -1,0 +1,1 @@
+# red.qwert.staticobjectsync by qwert
