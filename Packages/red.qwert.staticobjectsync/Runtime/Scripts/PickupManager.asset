@@ -62,7 +62,7 @@ MonoBehaviour:
       Data: 3|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Qwert.StaticObjectSync.PickupGhost, Assembly-CSharp
+      Data: Qwert.StaticObjectSync.PickupGhost, red.qwert.staticobjectsync
     - Name: 
       Entry: 8
       Data: 
