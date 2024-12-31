@@ -1,5 +1,4 @@
-﻿using System;
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
 
 namespace Qwert.Sandbox
@@ -19,41 +18,41 @@ namespace Qwert.Sandbox
             SendCustomEvent(callback);
         }
 
-        public void TeleportTo()
+        public void LocallyTeleportToGlobal()
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
             {
-                staticObjectSyncs[i].TeleportTo(
+                staticObjectSyncs[i].LocallyTeleportToGlobal(
                     staticObjectSyncs[i].transform.position + new Vector3(-0.1f, 0, 0),
                     staticObjectSyncs[i].transform.rotation
                 );
             }
         }
 
-        public void TeleportToGlobally()
+        public void GloballyTeleportToGlobal()
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
             {
-                staticObjectSyncs[i].TeleportToGlobally(
+                staticObjectSyncs[i].GloballyTeleportToGlobal(
                     staticObjectSyncs[i].transform.position + new Vector3(-0.1f, 0, 0),
                     staticObjectSyncs[i].transform.rotation
                 );
             }
         }
 
-        public void Respawn()
+        public void LocallyRespawn()
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
             {
-                staticObjectSyncs[i].Respawn();
+                staticObjectSyncs[i].LocallyRespawn();
             }
         }
 
-        public void RespawnGlobally()
+        public void GloballyRespawn()
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
             {
-                staticObjectSyncs[i].RespawnGlobally();
+                staticObjectSyncs[i].GloballyRespawn();
             }
         }
     }

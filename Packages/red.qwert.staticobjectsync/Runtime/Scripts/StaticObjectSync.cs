@@ -10,9 +10,14 @@ namespace Qwert.StaticObjectSync
     [AddComponentMenu("Static Object Sync/Static Object Sync")]
     public class StaticObjectSync : UdonSharpBehaviour
     {
+        [SerializeField] private StaticObjectContainerManager containerManager;
+
+        [UdonSynced] private string _containerId;
         [UdonSynced] private bool _hasBeenMoved;
-        [UdonSynced] private Vector3 _position;
-        [UdonSynced] private Quaternion _rotation;
+        [UdonSynced] private Vector3 _globalPosition;
+        [UdonSynced] private Quaternion _globalRotation;
+        [UdonSynced] private Vector3 _localPosition;
+        [UdonSynced] private Quaternion _localRotation;
 
         private Vector3 _initialPosition;
         private Quaternion _initialRotation;
@@ -27,7 +32,7 @@ namespace Qwert.StaticObjectSync
             {
                 if (value)
                 {
-                    SendCustomEvent(nameof(TeleportToSyncedTransform));
+                    SendCustomEvent(nameof(OnSync));
                 }
 
                 _sync = false;
@@ -36,8 +41,22 @@ namespace Qwert.StaticObjectSync
 
         private void Start()
         {
-            _position = _initialPosition = transform.position;
-            _rotation = _initialRotation = transform.rotation;
+            _containerId = GetCurrentContainerId();
+            _initialPosition = transform.position;
+            _initialRotation = transform.rotation;
+        }
+
+        private string GetCurrentContainerId()
+        {
+            if (!Utilities.IsValid(transform.parent))
+            {
+                return null;
+            }
+
+            var container = transform.parent.GetComponent<StaticObjectContainer>();
+            return Utilities.IsValid(container)
+                ? container.Id
+                : null;
         }
 
         public override void OnPlayerJoined(VRCPlayerApi player)
@@ -46,6 +65,15 @@ namespace Qwert.StaticObjectSync
             {
                 RequestSerialization();
             }
+        }
+
+        public override void OnPreSerialization()
+        {
+            _containerId = GetCurrentContainerId();
+            _globalPosition = transform.position;
+            _globalRotation = transform.rotation;
+            _localPosition = transform.localPosition;
+            _localRotation = transform.localRotation;
         }
 
         public override void OnPostSerialization(SerializationResult result)
@@ -61,47 +89,97 @@ namespace Qwert.StaticObjectSync
 
         public override void OnDrop()
         {
-            TeleportToGlobally(transform);
+            GloballyTeleportToGlobal(transform);
         }
 
-        public void Respawn()
+        public void LocallyRespawn()
         {
             transform.position = _initialPosition;
             transform.rotation = _initialRotation;
             _hasBeenMoved = false;
         }
 
-        public void RespawnGlobally()
+        public void GloballyRespawn()
         {
-            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(Respawn));
+            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(LocallyRespawn));
         }
 
-        public void TeleportToGlobally(Transform location) => TeleportToGlobally(location.position, location.rotation);
+        public void GloballyTeleportToGlobal(Transform location) => GloballyTeleportToGlobal(
+            location.position,
+            location.rotation
+        );
 
 
-        public void TeleportToGlobally(Vector3 position, Quaternion rotation)
+        public void GloballyTeleportToGlobal(Vector3 position, Quaternion rotation)
         {
             if (!Networking.IsOwner(gameObject))
             {
                 Networking.SetOwner(Networking.LocalPlayer, gameObject);
             }
 
-            transform.position = _position = position;
-            transform.rotation = _rotation = rotation;
-            _hasBeenMoved = true;
+            LocallyTeleportToGlobal(position, rotation);
             _sync = true;
             RequestSerialization();
         }
 
-        public void TeleportTo(Transform location) => TeleportTo(location.position, location.rotation);
+        public void LocallyTeleportToGlobal(Transform location) => LocallyTeleportToGlobal(
+            location.position,
+            location.rotation
+        );
 
-        public void TeleportTo(Vector3 position, Quaternion rotation)
+        public void LocallyTeleportToGlobal(Vector3 position, Quaternion rotation)
         {
             transform.position = position;
             transform.rotation = rotation;
             _hasBeenMoved = true;
         }
 
-        public void TeleportToSyncedTransform() => TeleportTo(_position, _rotation);
+        public void GloballyTeleportToLocal(Transform location) => GloballyTeleportToLocal(
+            location.position,
+            location.rotation
+        );
+
+        public void GloballyTeleportToLocal(Vector3 position, Quaternion rotation)
+        {
+            if (!Networking.IsOwner(gameObject))
+            {
+                Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            }
+
+            LocallyTeleportToLocal(position, rotation);
+            _sync = true;
+            RequestSerialization();
+        }
+
+        public void LocallyTeleportToLocal(Transform location) => LocallyTeleportToLocal(
+            location.position,
+            location.rotation
+        );
+
+        public void LocallyTeleportToLocal(Vector3 position, Quaternion rotation)
+        {
+            transform.localPosition = position;
+            transform.localRotation = rotation;
+            _hasBeenMoved = true;
+        }
+
+        public void OnSync()
+        {
+            if (!Utilities.IsValid(_containerId) || !Utilities.IsValid(containerManager))
+            {
+                LocallyTeleportToGlobal(_globalPosition, _globalRotation);
+                return;
+            }
+
+            var container = containerManager.Find(_containerId);
+            if (!Utilities.IsValid(container))
+            {
+                LocallyTeleportToGlobal(_globalPosition, _globalRotation);
+                return;
+            }
+
+            transform.SetParent(container.transform);
+            LocallyTeleportToLocal(_localPosition, _localRotation);
+        }
     }
 }
