@@ -19,8 +19,11 @@ namespace Qwert.StaticObjectSync
         [UdonSynced] private Vector3 _localPosition;
         [UdonSynced] private Quaternion _localRotation;
 
-        private Vector3 _initialPosition;
-        private Quaternion _initialRotation;
+        private Transform _originalParent;
+        private Vector3 _originalGlobalPosition;
+        private Quaternion _originalGlobalRotation;
+        private Vector3 _originalLocalPosition;
+        private Quaternion _originalLocalRotation;
 
         [UdonSynced, FieldChangeCallback(nameof(Sync))]
         private bool _sync;
@@ -42,8 +45,11 @@ namespace Qwert.StaticObjectSync
         private void Start()
         {
             _containerId = GetCurrentContainerId();
-            _initialPosition = transform.position;
-            _initialRotation = transform.rotation;
+            _originalParent = transform.parent;
+            _originalGlobalPosition = transform.position;
+            _originalGlobalRotation = transform.rotation;
+            _originalLocalPosition = transform.localPosition;
+            _originalLocalRotation = transform.localRotation;
         }
 
         private string GetCurrentContainerId()
@@ -92,23 +98,35 @@ namespace Qwert.StaticObjectSync
             GloballyTeleportToGlobal(transform);
         }
 
-        public void LocallyRespawn()
+        public void LocallyRespawnToGlobal()
         {
-            transform.position = _initialPosition;
-            transform.rotation = _initialRotation;
+            transform.position = _originalGlobalPosition;
+            transform.rotation = _originalGlobalRotation;
             _hasBeenMoved = false;
         }
 
-        public void GloballyRespawn()
+        public void GloballyRespawnToGlobal()
         {
-            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(LocallyRespawn));
+            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(LocallyRespawnToGlobal));
+        }
+
+        public void LocallyRespawnToLocal()
+        {
+            transform.SetParent(_originalParent);
+            transform.localPosition = _originalLocalPosition;
+            transform.localRotation = _originalLocalRotation;
+            _hasBeenMoved = false;
+        }
+
+        public void GloballyRespawnToLocal()
+        {
+            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(LocallyRespawnToLocal));
         }
 
         public void GloballyTeleportToGlobal(Transform location) => GloballyTeleportToGlobal(
             location.position,
             location.rotation
         );
-
 
         public void GloballyTeleportToGlobal(Vector3 position, Quaternion rotation)
         {

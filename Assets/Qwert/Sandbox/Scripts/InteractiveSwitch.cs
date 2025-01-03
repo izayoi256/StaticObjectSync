@@ -40,19 +40,38 @@ namespace Qwert.Sandbox
             }
         }
 
-        public void LocallyRespawn()
+        public void GloballyTeleportToLocal()
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
             {
-                staticObjectSyncs[i].LocallyRespawn();
+                staticObjectSyncs[i].GloballyTeleportToLocal(
+                    staticObjectSyncs[i].transform.localPosition + new Vector3(-0.1f, 0, 0),
+                    staticObjectSyncs[i].transform.localRotation
+                );
             }
         }
 
-        public void GloballyRespawn()
+        public void LocallyRespawnToGlobal()
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
             {
-                staticObjectSyncs[i].GloballyRespawn();
+                staticObjectSyncs[i].LocallyRespawnToGlobal();
+            }
+        }
+
+        public void GloballyRespawnToGlobal()
+        {
+            for (var i = 0; i < staticObjectSyncs.Length; i++)
+            {
+                staticObjectSyncs[i].GloballyRespawnToGlobal();
+            }
+        }
+
+        public void GloballyRespawnToLocal()
+        {
+            for (var i = 0; i < staticObjectSyncs.Length; i++)
+            {
+                staticObjectSyncs[i].GloballyRespawnToLocal();
             }
         }
     }
