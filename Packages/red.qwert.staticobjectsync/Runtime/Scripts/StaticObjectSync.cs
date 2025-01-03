@@ -13,11 +13,14 @@ namespace Qwert.StaticObjectSync
         [SerializeField] private StaticObjectContainerManager containerManager;
 
         [UdonSynced] private string _containerId;
-        [UdonSynced] private bool _hasBeenMoved;
         [UdonSynced] private Vector3 _globalPosition;
         [UdonSynced] private Quaternion _globalRotation;
         [UdonSynced] private Vector3 _localPosition;
         [UdonSynced] private Quaternion _localRotation;
+
+        [UdonSynced] private bool _hasBeenMoved;
+
+        public bool HasBeenMoved => _hasBeenMoved;
 
         private Transform _originalParent;
         private Vector3 _originalGlobalPosition;

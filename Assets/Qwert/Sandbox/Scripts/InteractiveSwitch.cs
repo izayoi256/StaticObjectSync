@@ -55,7 +55,10 @@ namespace Qwert.Sandbox
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
             {
-                staticObjectSyncs[i].LocallyRespawnToGlobal();
+                if (staticObjectSyncs[i].HasBeenMoved)
+                {
+                    staticObjectSyncs[i].LocallyRespawnToGlobal();
+                }
             }
         }
 
@@ -63,7 +66,10 @@ namespace Qwert.Sandbox
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
             {
-                staticObjectSyncs[i].GloballyRespawnToGlobal();
+                if (staticObjectSyncs[i].HasBeenMoved)
+                {
+                    staticObjectSyncs[i].GloballyRespawnToGlobal();
+                }
             }
         }
 
@@ -71,7 +77,10 @@ namespace Qwert.Sandbox
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
             {
-                staticObjectSyncs[i].GloballyRespawnToLocal();
+                if (staticObjectSyncs[i].HasBeenMoved)
+                {
+                    staticObjectSyncs[i].GloballyRespawnToLocal();
+                }
             }
         }
     }
