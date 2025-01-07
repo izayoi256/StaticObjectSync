@@ -131,6 +131,16 @@ namespace Qwert.StaticObjectSync
             location.rotation
         );
 
+        public void GloballyTeleportToGlobal(Vector3 position) => GloballyTeleportToGlobal(
+            position,
+            transform.rotation
+        );
+
+        public void GloballyRotateToGlobal(Quaternion rotation) => GloballyTeleportToGlobal(
+            transform.position,
+            rotation
+        );
+
         public void GloballyTeleportToGlobal(Vector3 position, Quaternion rotation)
         {
             if (!Networking.IsOwner(gameObject))
@@ -148,6 +158,16 @@ namespace Qwert.StaticObjectSync
             location.rotation
         );
 
+        public void LocallyTeleportToGlobal(Vector3 position) => LocallyTeleportToGlobal(
+            position,
+            transform.rotation
+        );
+
+        public void LocallyRotateToGlobal(Quaternion rotation) => LocallyTeleportToGlobal(
+            transform.position,
+            rotation
+        );
+
         public void LocallyTeleportToGlobal(Vector3 position, Quaternion rotation)
         {
             transform.position = position;
@@ -158,6 +178,16 @@ namespace Qwert.StaticObjectSync
         public void GloballyTeleportToLocal(Transform location) => GloballyTeleportToLocal(
             location.position,
             location.rotation
+        );
+
+        public void GloballyTeleportToLocal(Vector3 position) => GloballyTeleportToLocal(
+            position,
+            transform.localRotation
+        );
+
+        public void GloballyRotateToLocal(Quaternion rotation) => GloballyTeleportToLocal(
+            transform.localPosition,
+            rotation
         );
 
         public void GloballyTeleportToLocal(Vector3 position, Quaternion rotation)
@@ -175,6 +205,16 @@ namespace Qwert.StaticObjectSync
         public void LocallyTeleportToLocal(Transform location) => LocallyTeleportToLocal(
             location.position,
             location.rotation
+        );
+
+        public void LocallyTeleportToLocal(Vector3 position) => LocallyTeleportToLocal(
+            position,
+            transform.localRotation
+        );
+
+        public void LocallyRotateToLocal(Quaternion rotation) => LocallyTeleportToLocal(
+            transform.localPosition,
+            rotation
         );
 
         public void LocallyTeleportToLocal(Vector3 position, Quaternion rotation)
