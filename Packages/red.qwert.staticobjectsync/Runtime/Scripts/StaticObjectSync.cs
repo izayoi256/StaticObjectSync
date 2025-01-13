@@ -12,14 +12,27 @@ namespace Qwert.StaticObjectSync
     {
         [SerializeField] private StaticObjectContainerManager containerManager;
 
-        [UdonSynced] private string _containerId;
         [UdonSynced] private Vector3 _globalPosition;
         [UdonSynced] private Quaternion _globalRotation;
         [UdonSynced] private Vector3 _localPosition;
         [UdonSynced] private Quaternion _localRotation;
 
-        [UdonSynced] private bool _hasBeenMoved;
+        [UdonSynced, FieldChangeCallback(nameof(ContainerId))] private string _containerId;
+        private string ContainerId
+        {
+            get => _containerId;
+            set
+            {
+                _containerId = value;
+                _container = Utilities.IsValid(containerManager)
+                    ? containerManager.Find(_containerId)
+                    : null;
+            }
+        }
 
+        private StaticObjectContainer _container;
+
+        [UdonSynced] private bool _hasBeenMoved;
         public bool HasBeenMoved => _hasBeenMoved;
 
         private Transform _originalParent;
@@ -27,27 +40,11 @@ namespace Qwert.StaticObjectSync
         private Quaternion _originalGlobalRotation;
         private Vector3 _originalLocalPosition;
         private Quaternion _originalLocalRotation;
-
-        [UdonSynced, FieldChangeCallback(nameof(Sync))]
-        private bool _sync;
-
-        private bool Sync
-        {
-            get => _sync;
-            set
-            {
-                if (value)
-                {
-                    SendCustomEvent(nameof(OnSync));
-                }
-
-                _sync = false;
-            }
-        }
+        private bool _requestSerialization;
+        private bool _disableSerializationForCurrentFrame;
 
         private void Start()
         {
-            _containerId = GetCurrentContainerId();
             _originalParent = transform.parent;
             _originalGlobalPosition = transform.position;
             _originalGlobalRotation = transform.rotation;
@@ -55,16 +52,18 @@ namespace Qwert.StaticObjectSync
             _originalLocalRotation = transform.localRotation;
         }
 
-        private string GetCurrentContainerId()
+        private void UpdateCurrentContainerInfo()
         {
             if (!Utilities.IsValid(transform.parent))
             {
-                return null;
+                _container = null;
+                _containerId = null;
+                return;
             }
 
-            var container = transform.parent.GetComponent<StaticObjectContainer>();
-            return Utilities.IsValid(container)
-                ? container.Id
+            _container = transform.parent.GetComponent<StaticObjectContainer>();
+            _containerId = Utilities.IsValid(_container)
+                ? _container.Id
                 : null;
         }
 
@@ -72,28 +71,36 @@ namespace Qwert.StaticObjectSync
         {
             if (Networking.IsOwner(gameObject) && _hasBeenMoved)
             {
-                RequestSerialization();
+                _requestSerialization = true;
             }
         }
 
         public override void OnPreSerialization()
         {
-            _containerId = GetCurrentContainerId();
+            UpdateCurrentContainerInfo();
             _globalPosition = transform.position;
             _globalRotation = transform.rotation;
             _localPosition = transform.localPosition;
             _localRotation = transform.localRotation;
         }
 
-        public override void OnPostSerialization(SerializationResult result)
+        public override void OnDeserialization(DeserializationResult result)
         {
-            _sync = false;
+            if (Utilities.IsValid(_container))
+            {
+                transform.SetParent(_container.transform);
+                LocallyTeleportToLocal(_localPosition, _localRotation);
+            }
+            else
+            {
+                transform.SetParent(null);
+                LocallyTeleportToGlobal(_globalPosition, _globalRotation);
+            }
         }
 
         public override void OnPickup()
         {
             _hasBeenMoved = true;
-            RequestSerialization();
         }
 
         public override void OnDrop()
@@ -149,8 +156,7 @@ namespace Qwert.StaticObjectSync
             }
 
             LocallyTeleportToGlobal(position, rotation);
-            _sync = true;
-            RequestSerialization();
+            _requestSerialization = true;
         }
 
         public void LocallyTeleportToGlobal(Transform location) => LocallyTeleportToGlobal(
@@ -198,8 +204,7 @@ namespace Qwert.StaticObjectSync
             }
 
             LocallyTeleportToLocal(position, rotation);
-            _sync = true;
-            RequestSerialization();
+            _requestSerialization = true;
         }
 
         public void LocallyTeleportToLocal(Transform location) => LocallyTeleportToLocal(
@@ -224,23 +229,37 @@ namespace Qwert.StaticObjectSync
             _hasBeenMoved = true;
         }
 
-        public void OnSync()
+        public void GloballySetParentContainer(StaticObjectContainer container)
         {
-            if (!Utilities.IsValid(_containerId) || !Utilities.IsValid(containerManager))
+            if (!Networking.IsOwner(gameObject))
             {
-                LocallyTeleportToGlobal(_globalPosition, _globalRotation);
-                return;
+                Networking.SetOwner(Networking.LocalPlayer, gameObject);
             }
 
-            var container = containerManager.Find(_containerId);
-            if (!Utilities.IsValid(container))
+            LocallySetParentContainer(container);
+            _requestSerialization = true;
+        }
+
+        public void LocallySetParentContainer(StaticObjectContainer container)
+        {
+            transform.SetParent(
+                Utilities.IsValid(container)
+                    ? container.transform
+                    : null
+            );
+        }
+
+        public void DisableSerializationForCurrentFrame() => _disableSerializationForCurrentFrame = true;
+
+        public void LateUpdate()
+        {
+            if (_requestSerialization && !_disableSerializationForCurrentFrame)
             {
-                LocallyTeleportToGlobal(_globalPosition, _globalRotation);
-                return;
+                RequestSerialization();
             }
 
-            transform.SetParent(container.transform);
-            LocallyTeleportToLocal(_localPosition, _localRotation);
+            _requestSerialization = false;
+            _disableSerializationForCurrentFrame = false;
         }
     }
 }

@@ -51,6 +51,18 @@ namespace Qwert.Sandbox
             }
         }
 
+        public void GloballyTeleportToLocalDisableSerialization()
+        {
+            for (var i = 0; i < staticObjectSyncs.Length; i++)
+            {
+                staticObjectSyncs[i].DisableSerializationForCurrentFrame();
+                staticObjectSyncs[i].GloballyTeleportToLocal(
+                    staticObjectSyncs[i].transform.localPosition + new Vector3(-0.1f, 0, 0),
+                    staticObjectSyncs[i].transform.localRotation
+                );
+            }
+        }
+
         public void LocallyRespawnToGlobal()
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
@@ -79,6 +91,18 @@ namespace Qwert.Sandbox
             {
                 if (staticObjectSyncs[i].HasBeenMoved)
                 {
+                    staticObjectSyncs[i].GloballyRespawnToLocal();
+                }
+            }
+        }
+
+        public void GloballyRespawnToLocalDisableSerialization()
+        {
+            for (var i = 0; i < staticObjectSyncs.Length; i++)
+            {
+                if (staticObjectSyncs[i].HasBeenMoved)
+                {
+                    staticObjectSyncs[i].DisableSerializationForCurrentFrame();
                     staticObjectSyncs[i].GloballyRespawnToLocal();
                 }
             }

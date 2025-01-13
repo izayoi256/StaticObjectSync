@@ -1,7 +1,7 @@
 {
   "name": "red.qwert.staticobjectsync",
   "displayName": "StaticObjectSync",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A tool for synchronizing static objects with less continuous syncing",
   "dependencies": {},
   "gitDependencies": {},
