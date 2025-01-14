@@ -96,18 +96,18 @@ namespace Qwert.StaticObjectSync
                     continue;
                 }
 
-                var pickupFollower = playerObject.GetComponent<PickupGhost>();
-                if (!Utilities.IsValid(pickupFollower))
+                var pickupGhost = playerObject.GetComponent<PickupGhost>();
+                if (!Utilities.IsValid(pickupGhost))
                 {
                     continue;
                 }
 
                 if (
-                    (pickupHand == PickupHand.Left && pickupFollower.IsLeftHand) ||
-                    (pickupHand == PickupHand.Right && pickupFollower.IsRightHand)
+                    (pickupHand == PickupHand.Left && pickupGhost.IsLeftHand) ||
+                    (pickupHand == PickupHand.Right && pickupGhost.IsRightHand)
                 )
                 {
-                    return pickupFollower;
+                    return pickupGhost;
                 }
             }
 

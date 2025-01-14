@@ -79,11 +79,11 @@ namespace Qwert.StaticObjectSync
             {
                 if (Utilities.IsValid(pickupManager))
                 {
-                    var pickupFollower = pickupManager.GetPickupGhostOf(Networking.GetOwner(gameObject), _pickupHand);
+                    var pickupGhost = pickupManager.GetPickupGhostOf(Networking.GetOwner(gameObject), _pickupHand);
 
-                    if (Utilities.IsValid(pickupFollower))
+                    if (Utilities.IsValid(pickupGhost))
                     {
-                        Follow(pickupFollower.transform);
+                        Follow(pickupGhost.transform);
                     }
                 }
 

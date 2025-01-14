@@ -16,8 +16,10 @@ namespace Qwert.StaticObjectSync
     {
         [SerializeField] private PickupManager pickupManager;
         [SerializeField] private PickupHand pickupHand;
+        [SerializeField] private bool temp;
 
         private ParentConstraint _constraint;
+        private VRCObjectSync _objectSync;
 
         public bool IsLocal { get; private set; }
         public bool IsRightHand => pickupHand == PickupHand.Right;
@@ -26,6 +28,7 @@ namespace Qwert.StaticObjectSync
         private void Start()
         {
             _constraint = GetComponentInParent<ParentConstraint>();
+            _objectSync = GetComponentInParent<VRCObjectSync>();
 
             var owner = Networking.GetOwner(gameObject);
             IsLocal = Utilities.IsValid(owner) && owner.isLocal;
@@ -42,6 +45,8 @@ namespace Qwert.StaticObjectSync
             {
                 return;
             }
+
+            _objectSync.TeleportTo(pickup.transform);
 
             var source = new ConstraintSource();
             source.sourceTransform = pickup.transform;
