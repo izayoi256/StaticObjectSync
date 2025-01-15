@@ -23,6 +23,7 @@ namespace Qwert.StaticObjectSync
         [SerializeField] PickupManager pickupManager;
 
         private VRCPlayerApi _owner;
+        private PickupGhost _pickupGhost;
         [UdonSynced] private PickupHand _pickupHand;
 
         [UdonSynced, FieldChangeCallback(nameof(OwnerId))]
@@ -72,6 +73,12 @@ namespace Qwert.StaticObjectSync
         {
             if (_pickupHand == PickupHand.None)
             {
+                if (Utilities.IsValid(_pickupGhost))
+                {
+                    _pickupGhost.UnregisterFollower();
+                    _pickupGhost = null;
+                }
+
                 Unfollow();
                 _pickup.pickupable = true;
             }
@@ -79,11 +86,11 @@ namespace Qwert.StaticObjectSync
             {
                 if (Utilities.IsValid(pickupManager))
                 {
-                    var pickupGhost = pickupManager.GetPickupGhostOf(Networking.GetOwner(gameObject), _pickupHand);
+                    _pickupGhost = pickupManager.GetPickupGhostOf(Networking.GetOwner(gameObject), _pickupHand);
 
-                    if (Utilities.IsValid(pickupGhost))
+                    if (Utilities.IsValid(_pickupGhost))
                     {
-                        Follow(pickupGhost.transform);
+                        _pickupGhost.RegisterFollower(this);
                     }
                 }
 
@@ -136,7 +143,12 @@ namespace Qwert.StaticObjectSync
             return PickupHand.None;
         }
 
-        private void Follow(Transform target)
+        public bool IsFollowing()
+        {
+            return _constraint.sourceCount > 0;
+        }
+
+        public void Follow(Transform target)
         {
             if (!Utilities.IsValid(target))
             {
@@ -150,7 +162,7 @@ namespace Qwert.StaticObjectSync
             _constraint.constraintActive = true;
         }
 
-        private void Unfollow()
+        public void Unfollow()
         {
             for (var i = 0; i < _constraint.sourceCount; i++)
             {

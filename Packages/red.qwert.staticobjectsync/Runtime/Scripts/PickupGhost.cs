@@ -16,10 +16,12 @@ namespace Qwert.StaticObjectSync
     {
         [SerializeField] private PickupManager pickupManager;
         [SerializeField] private PickupHand pickupHand;
-        [SerializeField] private bool temp;
+
+        [UdonSynced] private bool _enabled;
 
         private ParentConstraint _constraint;
         private VRCObjectSync _objectSync;
+        private Pickup _followerPickup;
 
         public bool IsLocal { get; private set; }
         public bool IsRightHand => pickupHand == PickupHand.Right;
@@ -39,6 +41,24 @@ namespace Qwert.StaticObjectSync
             }
         }
 
+        public override void OnDeserialization()
+        {
+            if (_enabled && Utilities.IsValid(_followerPickup) && !_followerPickup.IsFollowing())
+            {
+                _followerPickup.Follow(transform);
+            }
+        }
+
+        public void RegisterFollower(Pickup pickup)
+        {
+            _followerPickup = pickup;
+        }
+
+        public void UnregisterFollower()
+        {
+            _followerPickup = null;
+        }
+
         public void OnLocalPickup(Pickup pickup)
         {
             if (!Utilities.IsValid(pickup))
@@ -46,6 +66,7 @@ namespace Qwert.StaticObjectSync
                 return;
             }
 
+            _enabled = true;
             _objectSync.TeleportTo(pickup.transform);
 
             var source = new ConstraintSource();
@@ -57,6 +78,8 @@ namespace Qwert.StaticObjectSync
 
         public void OnLocalDrop(Pickup pickup)
         {
+            _enabled = false;
+
             for (var i = 0; i < _constraint.sourceCount; i++)
             {
                 _constraint.RemoveSource(0);
