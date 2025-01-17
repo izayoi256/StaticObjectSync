@@ -260,10 +260,8 @@ namespace Qwert.StaticObjectSync
 
         public void DelayedRequestSerialization()
         {
-            Debug.Log($"_requestSerializationCount: {_requestSerializationCount}");
             if (_requestSerializationCount == 1)
             {
-                Debug.Log("Go!");
                 if (!_disableNextSerialization)
                 {
                     base.RequestSerialization();
