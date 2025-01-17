@@ -37,6 +37,10 @@ namespace Qwert.Sandbox
                     staticObjectSyncs[i].transform.position + new Vector3(-0.1f, 0, 0),
                     staticObjectSyncs[i].transform.rotation
                 );
+                staticObjectSyncs[i].GloballyTeleportToGlobal(
+                    staticObjectSyncs[i].transform.position + new Vector3(-0.1f, 0, 0),
+                    staticObjectSyncs[i].transform.rotation
+                );
             }
         }
 
@@ -48,6 +52,10 @@ namespace Qwert.Sandbox
                     staticObjectSyncs[i].transform.localPosition + new Vector3(-0.1f, 0, 0),
                     staticObjectSyncs[i].transform.localRotation
                 );
+                staticObjectSyncs[i].GloballyTeleportToLocal(
+                    staticObjectSyncs[i].transform.localPosition + new Vector3(-0.1f, 0, 0),
+                    staticObjectSyncs[i].transform.localRotation
+                );
             }
         }
 
@@ -55,7 +63,11 @@ namespace Qwert.Sandbox
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)
             {
-                staticObjectSyncs[i].DisableSerializationForCurrentFrame();
+                staticObjectSyncs[i].DisableNextSerialization();
+                staticObjectSyncs[i].GloballyTeleportToLocal(
+                    staticObjectSyncs[i].transform.localPosition + new Vector3(-0.1f, 0, 0),
+                    staticObjectSyncs[i].transform.localRotation
+                );
                 staticObjectSyncs[i].GloballyTeleportToLocal(
                     staticObjectSyncs[i].transform.localPosition + new Vector3(-0.1f, 0, 0),
                     staticObjectSyncs[i].transform.localRotation
@@ -102,7 +114,7 @@ namespace Qwert.Sandbox
             {
                 if (staticObjectSyncs[i].HasBeenMoved)
                 {
-                    staticObjectSyncs[i].DisableSerializationForCurrentFrame();
+                    staticObjectSyncs[i].DisableNextSerialization();
                     staticObjectSyncs[i].GloballyRespawnToLocal();
                 }
             }

@@ -1,4 +1,5 @@
-﻿using UdonSharp;
+﻿using System;
+using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon.Common;
@@ -40,8 +41,8 @@ namespace Qwert.StaticObjectSync
         private Quaternion _originalGlobalRotation;
         private Vector3 _originalLocalPosition;
         private Quaternion _originalLocalRotation;
-        private bool _requestSerialization;
-        private bool _disableSerializationForCurrentFrame;
+        private bool _disableNextSerialization;
+        private int _requestSerializationCount = 0;
 
         private void Start()
         {
@@ -71,7 +72,7 @@ namespace Qwert.StaticObjectSync
         {
             if (Networking.IsOwner(gameObject) && _hasBeenMoved)
             {
-                _requestSerialization = true;
+                RequestSerialization();
             }
         }
 
@@ -156,7 +157,7 @@ namespace Qwert.StaticObjectSync
             }
 
             LocallyTeleportToGlobal(position, rotation);
-            _requestSerialization = true;
+            RequestSerialization();
         }
 
         public void LocallyTeleportToGlobal(Transform location) => LocallyTeleportToGlobal(
@@ -204,7 +205,7 @@ namespace Qwert.StaticObjectSync
             }
 
             LocallyTeleportToLocal(position, rotation);
-            _requestSerialization = true;
+            RequestSerialization();
         }
 
         public void LocallyTeleportToLocal(Transform location) => LocallyTeleportToLocal(
@@ -237,7 +238,7 @@ namespace Qwert.StaticObjectSync
             }
 
             LocallySetParentContainer(container);
-            _requestSerialization = true;
+            RequestSerialization();
         }
 
         public void LocallySetParentContainer(StaticObjectContainer container)
@@ -249,17 +250,29 @@ namespace Qwert.StaticObjectSync
             );
         }
 
-        public void DisableSerializationForCurrentFrame() => _disableSerializationForCurrentFrame = true;
+        public void DisableNextSerialization() => _disableNextSerialization = true;
 
-        public void LateUpdate()
+        public new void RequestSerialization()
         {
-            if (_requestSerialization && !_disableSerializationForCurrentFrame)
+            _requestSerializationCount++;
+            SendCustomEventDelayedFrames(nameof(DelayedRequestSerialization), 0);
+        }
+
+        public void DelayedRequestSerialization()
+        {
+            Debug.Log($"_requestSerializationCount: {_requestSerializationCount}");
+            if (_requestSerializationCount == 1)
             {
-                RequestSerialization();
+                Debug.Log("Go!");
+                if (!_disableNextSerialization)
+                {
+                    base.RequestSerialization();
+                }
+
+                _disableNextSerialization = false;
             }
 
-            _requestSerialization = false;
-            _disableSerializationForCurrentFrame = false;
+            _requestSerializationCount = Math.Max(0, _requestSerializationCount - 1);
         }
     }
 }
