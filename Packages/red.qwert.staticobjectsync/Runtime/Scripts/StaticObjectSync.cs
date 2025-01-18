@@ -68,6 +68,14 @@ namespace Qwert.StaticObjectSync
                 : null;
         }
 
+        private void UpdateTransformInfo()
+        {
+            _globalPosition = transform.position;
+            _globalRotation = transform.rotation;
+            _localPosition = transform.localPosition;
+            _localRotation = transform.localRotation;
+        }
+
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
             if (Networking.IsOwner(gameObject) && _hasBeenMoved)
@@ -79,10 +87,7 @@ namespace Qwert.StaticObjectSync
         public override void OnPreSerialization()
         {
             UpdateCurrentContainerInfo();
-            _globalPosition = transform.position;
-            _globalRotation = transform.rotation;
-            _localPosition = transform.localPosition;
-            _localRotation = transform.localRotation;
+            UpdateTransformInfo();
         }
 
         public override void OnDeserialization(DeserializationResult result)
@@ -114,6 +119,8 @@ namespace Qwert.StaticObjectSync
             transform.position = _originalGlobalPosition;
             transform.rotation = _originalGlobalRotation;
             _hasBeenMoved = false;
+            UpdateCurrentContainerInfo();
+            UpdateTransformInfo();
         }
 
         public void GloballyRespawnToGlobal()
@@ -127,6 +134,8 @@ namespace Qwert.StaticObjectSync
             transform.localPosition = _originalLocalPosition;
             transform.localRotation = _originalLocalRotation;
             _hasBeenMoved = false;
+            UpdateCurrentContainerInfo();
+            UpdateTransformInfo();
         }
 
         public void GloballyRespawnToLocal()

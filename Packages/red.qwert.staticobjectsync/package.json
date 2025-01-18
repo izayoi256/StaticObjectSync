@@ -1,12 +1,12 @@
 {
   "name": "red.qwert.staticobjectsync",
   "displayName": "StaticObjectSync",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A tool for synchronizing static objects with less continuous syncing",
   "dependencies": {},
   "gitDependencies": {},
   "vpmDependencies": {
-    "com.vrchat.worlds": "3.7.x"
+    "com.vrchat.worlds": "^3.7.4"
   },
   "author": {
     "name": "Qwert",
