@@ -75,17 +75,6 @@ namespace Qwert.Sandbox
             }
         }
 
-        public void LocallyRespawnToGlobal()
-        {
-            for (var i = 0; i < staticObjectSyncs.Length; i++)
-            {
-                if (staticObjectSyncs[i].HasBeenMoved)
-                {
-                    staticObjectSyncs[i].LocallyRespawnToGlobal();
-                }
-            }
-        }
-
         public void GloballyRespawnToGlobal()
         {
             for (var i = 0; i < staticObjectSyncs.Length; i++)

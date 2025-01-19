@@ -3,7 +3,6 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon.Common;
-using VRC.Udon.Common.Interfaces;
 
 namespace Qwert.StaticObjectSync
 {
@@ -70,6 +69,7 @@ namespace Qwert.StaticObjectSync
 
         private void UpdateTransformInfo()
         {
+            UpdateCurrentContainerInfo();
             _globalPosition = transform.position;
             _globalRotation = transform.rotation;
             _localPosition = transform.localPosition;
@@ -86,7 +86,6 @@ namespace Qwert.StaticObjectSync
 
         public override void OnPreSerialization()
         {
-            UpdateCurrentContainerInfo();
             UpdateTransformInfo();
         }
 
@@ -114,33 +113,41 @@ namespace Qwert.StaticObjectSync
             GloballyTeleportToGlobal(transform);
         }
 
-        public void LocallyRespawnToGlobal()
+        private void LocallyRespawnToGlobal()
         {
             transform.position = _originalGlobalPosition;
             transform.rotation = _originalGlobalRotation;
             _hasBeenMoved = false;
-            UpdateCurrentContainerInfo();
-            UpdateTransformInfo();
         }
 
         public void GloballyRespawnToGlobal()
         {
-            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(LocallyRespawnToGlobal));
+            if (!Networking.IsOwner(gameObject))
+            {
+                Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            }
+
+            LocallyRespawnToGlobal();
+            RequestSerialization();
         }
 
-        public void LocallyRespawnToLocal()
+        private void LocallyRespawnToLocal()
         {
             transform.SetParent(_originalParent);
             transform.localPosition = _originalLocalPosition;
             transform.localRotation = _originalLocalRotation;
             _hasBeenMoved = false;
-            UpdateCurrentContainerInfo();
-            UpdateTransformInfo();
         }
 
         public void GloballyRespawnToLocal()
         {
-            SendCustomNetworkEvent(NetworkEventTarget.All, nameof(LocallyRespawnToLocal));
+            if (!Networking.IsOwner(gameObject))
+            {
+                Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            }
+
+            LocallyRespawnToLocal();
+            RequestSerialization();
         }
 
         public void GloballyTeleportToGlobal(Transform location) => GloballyTeleportToGlobal(
