@@ -13,6 +13,12 @@ namespace Qwert.StaticObjectSync
         Left,
     }
 
+    public enum PickupInterpolationMode
+    {
+        None,
+        Lerp,
+    }
+
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     [RequireComponent(typeof(StaticObjectSync))]
     [RequireComponent(typeof(VRCPickup))]
@@ -20,7 +26,13 @@ namespace Qwert.StaticObjectSync
     [AddComponentMenu("Static Object Sync/Pickup")]
     public class Pickup : UdonSharpBehaviour
     {
-        [SerializeField] PickupManager pickupManager;
+        [SerializeField] private PickupManager pickupManager;
+
+        [SerializeField] private PickupInterpolationMode interpolationMode = PickupInterpolationMode.None;
+        [SerializeField] private float stabilizationReduceAngle = 7.5f;
+        [SerializeField] private float stabilizationEndAngle = 45f;
+        [SerializeField] private float stabilizationReducePosition = 0.005f;
+        [SerializeField] private float stabilizationEndPosition = 0.025f;
 
         private VRCPlayerApi _owner;
         private PickupGhost _pickupGhost;
@@ -49,7 +61,12 @@ namespace Qwert.StaticObjectSync
             }
         }
 
+        public PickupInterpolationMode InterpolationMode => interpolationMode;
         public PickupHand PickupHand => _pickupHand;
+        public float StabilizationReduceAngle => stabilizationReduceAngle;
+        public float StabilizationEndAngle => stabilizationEndAngle;
+        public float StabilizationReducePosition => stabilizationReducePosition;
+        public float StabilizationEndPosition => stabilizationEndPosition;
         private bool IsHeldGlobally => PickupHand != PickupHand.None;
 
         private VRCPickup _pickup;

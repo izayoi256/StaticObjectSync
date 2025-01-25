@@ -22,6 +22,7 @@ namespace Qwert.StaticObjectSync
         private ParentConstraint _constraint;
         private VRCObjectSync _objectSync;
         private Pickup _followerPickup;
+        private LerpedPickupGhost _lerpedPickupGhost;
 
         public bool IsLocal { get; private set; }
         public bool IsRightHand => pickupHand == PickupHand.Right;
@@ -45,9 +46,29 @@ namespace Qwert.StaticObjectSync
         {
             if (_enabled && Utilities.IsValid(_followerPickup) && !_followerPickup.IsFollowing())
             {
-                _followerPickup.Follow(transform);
+                if (_followerPickup.InterpolationMode == PickupInterpolationMode.None)
+                {
+                    _followerPickup.Follow(transform);
+                }
+                else if (_followerPickup.InterpolationMode == PickupInterpolationMode.Lerp)
+                {
+                    if (Utilities.IsValid(_lerpedPickupGhost))
+                    {
+                        _followerPickup.Follow(_lerpedPickupGhost.transform);
+                        _lerpedPickupGhost.SetStabilizationValues(
+                            _followerPickup.StabilizationReduceAngle,
+                            _followerPickup.StabilizationEndAngle,
+                            _followerPickup.StabilizationReducePosition,
+                            _followerPickup.StabilizationEndPosition
+                        );
+                        _lerpedPickupGhost.transform.position = _followerPickup.transform.position;
+                        _lerpedPickupGhost.transform.rotation = _followerPickup.transform.rotation;
+                    }
+                }
             }
         }
+
+        public void SetLerpedPickupGhost(LerpedPickupGhost lerpedPickupGhost) => _lerpedPickupGhost = lerpedPickupGhost;
 
         public void RegisterFollower(Pickup pickup)
         {
