@@ -404,19 +404,19 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: _lerpedPickupGhost
+      Data: _interpolatedPickupGhost
     - Name: $v
       Entry: 7
       Data: 25|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: _lerpedPickupGhost
+      Data: _interpolatedPickupGhost
     - Name: <UserType>k__BackingField
       Entry: 7
       Data: 26|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Qwert.StaticObjectSync.LerpedPickupGhost, red.qwert.staticobjectsync
+      Data: Qwert.StaticObjectSync.InterpolatedPickupGhost, red.qwert.staticobjectsync
     - Name: 
       Entry: 8
       Data: 

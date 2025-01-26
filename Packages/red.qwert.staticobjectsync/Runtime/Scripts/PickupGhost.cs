@@ -22,7 +22,7 @@ namespace Qwert.StaticObjectSync
         private ParentConstraint _constraint;
         private VRCObjectSync _objectSync;
         private Pickup _followerPickup;
-        private LerpedPickupGhost _lerpedPickupGhost;
+        private InterpolatedPickupGhost _interpolatedPickupGhost;
 
         public bool IsLocal { get; private set; }
         public bool IsRightHand => pickupHand == PickupHand.Right;
@@ -50,25 +50,18 @@ namespace Qwert.StaticObjectSync
                 {
                     _followerPickup.Follow(transform);
                 }
-                else if (_followerPickup.InterpolationMode == PickupInterpolationMode.Lerp)
+                else if (_followerPickup.InterpolationMode == PickupInterpolationMode.SmoothDamp)
                 {
-                    if (Utilities.IsValid(_lerpedPickupGhost))
+                    if (Utilities.IsValid(_interpolatedPickupGhost))
                     {
-                        _followerPickup.Follow(_lerpedPickupGhost.transform);
-                        _lerpedPickupGhost.SetStabilizationValues(
-                            _followerPickup.StabilizationReduceAngle,
-                            _followerPickup.StabilizationEndAngle,
-                            _followerPickup.StabilizationReducePosition,
-                            _followerPickup.StabilizationEndPosition
-                        );
-                        _lerpedPickupGhost.transform.position = _followerPickup.transform.position;
-                        _lerpedPickupGhost.transform.rotation = _followerPickup.transform.rotation;
+                        _followerPickup.Follow(_interpolatedPickupGhost.transform);
+                        _interpolatedPickupGhost.FollowPickupGhost(this, _followerPickup);
                     }
                 }
             }
         }
 
-        public void SetLerpedPickupGhost(LerpedPickupGhost lerpedPickupGhost) => _lerpedPickupGhost = lerpedPickupGhost;
+        public void SetInterpolatedPickupGhost(InterpolatedPickupGhost interpolatedPickupGhost) => _interpolatedPickupGhost = interpolatedPickupGhost;
 
         public void RegisterFollower(Pickup pickup)
         {
