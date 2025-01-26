@@ -29,7 +29,8 @@ namespace Qwert.StaticObjectSync
         [SerializeField] private PickupManager pickupManager;
 
         [SerializeField] private PickupInterpolationMode interpolationMode = PickupInterpolationMode.None;
-        [SerializeField] private float smoothTime = 0.1f;
+        [SerializeField] private float positionSmoothTime = 0.1f;
+        [SerializeField] private float rotationSmoothTime = 0.1f;
 
         private VRCPlayerApi _owner;
         private PickupGhost _pickupGhost;
@@ -60,7 +61,8 @@ namespace Qwert.StaticObjectSync
 
         public PickupInterpolationMode InterpolationMode => interpolationMode;
         public PickupHand PickupHand => _pickupHand;
-        public float SmoothTime => smoothTime;
+        public float PositionSmoothTime => positionSmoothTime;
+        public float RotationSmoothTime => rotationSmoothTime;
         private bool IsHeldGlobally => PickupHand != PickupHand.None;
 
         private VRCPickup _pickup;

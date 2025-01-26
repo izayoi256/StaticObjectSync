@@ -59,6 +59,14 @@ namespace Qwert.StaticObjectSync
                     }
                 }
             }
+
+            if (!_enabled)
+            {
+                if (Utilities.IsValid(_interpolatedPickupGhost))
+                {
+                    _interpolatedPickupGhost.Unfollow();
+                }
+            }
         }
 
         public void SetInterpolatedPickupGhost(InterpolatedPickupGhost interpolatedPickupGhost) => _interpolatedPickupGhost = interpolatedPickupGhost;

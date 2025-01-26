@@ -16,8 +16,10 @@ namespace Qwert.StaticObjectSync
         public bool IsLeftHand => pickupHand == PickupHand.Left;
 
         private Transform _target;
-        private Vector3 _velocity;
-        private float _smoothTime;
+        private Vector3 _positionVelocity = Vector3.zero;
+        private Vector3 _angularVelocity = Vector3.zero;
+        private float _positionSmoothTime;
+        private float _rotationSmoothTime;
 
         private void Start()
         {
@@ -65,9 +67,12 @@ namespace Qwert.StaticObjectSync
         {
             transform.position = pickup.transform.position;
             transform.rotation = pickup.transform.rotation;
-            _smoothTime = pickup.SmoothTime;
+            _positionSmoothTime = pickup.PositionSmoothTime;
+            _rotationSmoothTime = pickup.RotationSmoothTime;
             _target = pickupGhost.transform;
         }
+
+        public void Unfollow() => _target = null;
 
         private void Update()
         {
@@ -76,11 +81,37 @@ namespace Qwert.StaticObjectSync
                 transform.position = Vector3.SmoothDamp(
                     transform.position,
                     _target.position,
-                    ref _velocity,
-                    _smoothTime
+                    ref _positionVelocity,
+                    _positionSmoothTime
                 );
 
                 transform.rotation = _target.rotation;
+
+                var targetEulerAngles = _target.rotation.eulerAngles;
+                var currentEulerAngles = transform.eulerAngles;
+
+                var smoothX = Mathf.SmoothDampAngle(
+                    currentEulerAngles.x,
+                    targetEulerAngles.x,
+                    ref _angularVelocity.x,
+                    _rotationSmoothTime
+                );
+
+                var smoothY = Mathf.SmoothDampAngle(
+                    currentEulerAngles.y,
+                    targetEulerAngles.y,
+                    ref _angularVelocity.y,
+                    _rotationSmoothTime
+                );
+
+                var smoothZ = Mathf.SmoothDampAngle(
+                    currentEulerAngles.z,
+                    targetEulerAngles.z,
+                    ref _angularVelocity.z,
+                    _rotationSmoothTime
+                );
+
+                transform.rotation = Quaternion.Euler(smoothX, smoothY, smoothZ);
             }
         }
     }
