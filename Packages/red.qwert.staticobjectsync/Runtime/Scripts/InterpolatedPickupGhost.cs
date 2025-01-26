@@ -79,6 +79,8 @@ namespace Qwert.StaticObjectSync
                     ref _velocity,
                     _smoothTime
                 );
+
+                transform.rotation = _target.rotation;
             }
         }
     }
