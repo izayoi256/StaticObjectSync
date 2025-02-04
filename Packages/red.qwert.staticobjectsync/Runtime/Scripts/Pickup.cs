@@ -173,6 +173,7 @@ namespace Qwert.StaticObjectSync
             source.weight = 1.0f;
             _constraint.AddSource(source);
             _constraint.constraintActive = true;
+            _constraint.enabled = true;
         }
 
         public void Unfollow()
@@ -183,6 +184,7 @@ namespace Qwert.StaticObjectSync
             }
 
             _constraint.constraintActive = false;
+            _constraint.enabled = false;
         }
     }
 }
