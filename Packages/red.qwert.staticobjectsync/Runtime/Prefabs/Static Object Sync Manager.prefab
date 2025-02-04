@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 165610114911894789}
   - component: {fileID: 6583739371876169046}
   m_Layer: 0
-  m_Name: Lerped Pickup Ghost (Left Hand)
+  m_Name: Interpolated Pickup Ghost (Left Hand)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -69,12 +69,6 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 6583739371876169046}
   pickupHand: 2
-  rotationStabilization: 1
-  stabilizationReduceAngle: 7.5
-  stabilizationEndAngle: 45
-  positionStabilization: 1
-  stabilizationReducePosition: 0.005
-  stabilizationEndPosition: 0.025
 --- !u!114 &6583739371876169046
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -305,7 +299,7 @@ ParentConstraint:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5582364494782302732}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Weight: 1
   m_TranslationAtRest: {x: 0, y: 0, z: 0}
@@ -426,7 +420,7 @@ GameObject:
   - component: {fileID: 182223980313217033}
   - component: {fileID: 1071415400135087061}
   m_Layer: 0
-  m_Name: Lerped Pickup Ghost (Right Hand)
+  m_Name: Interpolated Pickup Ghost (Right Hand)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -482,12 +476,6 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1071415400135087061}
   pickupHand: 1
-  rotationStabilization: 1
-  stabilizationReduceAngle: 7.5
-  stabilizationEndAngle: 45
-  positionStabilization: 1
-  stabilizationReducePosition: 0.005
-  stabilizationEndPosition: 0.025
 --- !u!114 &1071415400135087061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -583,7 +571,7 @@ ParentConstraint:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8374681324856606073}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Weight: 1
   m_TranslationAtRest: {x: 0, y: 0, z: 0}

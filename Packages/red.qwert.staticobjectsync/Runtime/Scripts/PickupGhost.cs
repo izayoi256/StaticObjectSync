@@ -31,6 +31,8 @@ namespace Qwert.StaticObjectSync
         private void Start()
         {
             _constraint = GetComponentInParent<ParentConstraint>();
+            _constraint.enabled = false;
+
             _objectSync = GetComponentInParent<VRCObjectSync>();
 
             var owner = Networking.GetOwner(gameObject);

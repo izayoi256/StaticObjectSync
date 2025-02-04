@@ -72,6 +72,7 @@ namespace Qwert.StaticObjectSync
         {
             _pickup = GetComponent<VRCPickup>();
             _constraint = GetComponent<ParentConstraint>();
+            _constraint.enabled = false;
         }
 
         public override void OnPlayerJoined(VRCPlayerApi player)
