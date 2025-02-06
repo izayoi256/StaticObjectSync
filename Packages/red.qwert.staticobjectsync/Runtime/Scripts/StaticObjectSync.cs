@@ -11,6 +11,7 @@ namespace Qwert.StaticObjectSync
     public class StaticObjectSync : UdonSharpBehaviour
     {
         [SerializeField] private StaticObjectContainerManager containerManager;
+        [SerializeField] private bool syncContainer;
 
         [UdonSynced] private Vector3 _globalPosition;
         [UdonSynced] private Quaternion _globalRotation;
@@ -91,14 +92,21 @@ namespace Qwert.StaticObjectSync
 
         public override void OnDeserialization(DeserializationResult result)
         {
-            if (Utilities.IsValid(_container))
+            if (syncContainer)
             {
-                transform.SetParent(_container.transform);
-                LocallyTeleportToLocal(_localPosition, _localRotation);
+                if (Utilities.IsValid(_container))
+                {
+                    transform.SetParent(_container.transform);
+                    LocallyTeleportToLocal(_localPosition, _localRotation);
+                }
+                else
+                {
+                    transform.SetParent(null);
+                    LocallyTeleportToGlobal(_globalPosition, _globalRotation);
+                }
             }
             else
             {
-                transform.SetParent(null);
                 LocallyTeleportToGlobal(_globalPosition, _globalRotation);
             }
         }
