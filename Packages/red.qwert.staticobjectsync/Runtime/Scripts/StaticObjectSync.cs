@@ -199,8 +199,8 @@ namespace Qwert.StaticObjectSync
         }
 
         public void GloballyTeleportToLocal(Transform location) => GloballyTeleportToLocal(
-            location.position,
-            location.rotation
+            location.localPosition,
+            location.localRotation
         );
 
         public void GloballyTeleportToLocal(Vector3 position) => GloballyTeleportToLocal(
@@ -225,8 +225,8 @@ namespace Qwert.StaticObjectSync
         }
 
         public void LocallyTeleportToLocal(Transform location) => LocallyTeleportToLocal(
-            location.position,
-            location.rotation
+            location.localPosition,
+            location.localRotation
         );
 
         public void LocallyTeleportToLocal(Vector3 position) => LocallyTeleportToLocal(
