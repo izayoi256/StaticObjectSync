@@ -11,29 +11,26 @@ namespace Qwert.StaticObjectSync
     public class StaticObjectSync : UdonSharpBehaviour
     {
         [SerializeField] private StaticObjectContainerManager containerManager;
+        [SerializeField] private bool syncContainer;
 
         [UdonSynced] private Vector3 _globalPosition;
         [UdonSynced] private Quaternion _globalRotation;
         [UdonSynced] private Vector3 _localPosition;
         [UdonSynced] private Quaternion _localRotation;
 
-        [UdonSynced, FieldChangeCallback(nameof(ContainerId))]
-        private string _containerId;
-
+        [UdonSynced, FieldChangeCallback(nameof(ContainerId))] private string _containerId;
         private string ContainerId
         {
             get => _containerId;
             set
             {
                 _containerId = value;
-                _previousContainer = _container;
                 _container = Utilities.IsValid(containerManager)
                     ? containerManager.Find(_containerId)
                     : null;
             }
         }
 
-        private StaticObjectContainer _previousContainer;
         private StaticObjectContainer _container;
 
         [UdonSynced] private bool _hasBeenMoved;
@@ -45,7 +42,7 @@ namespace Qwert.StaticObjectSync
         private Vector3 _originalLocalPosition;
         private Quaternion _originalLocalRotation;
         private bool _disableNextSerialization;
-        private int _requestSerializationCount;
+        private int _requestSerializationCount = 0;
 
         private void Start()
         {
@@ -54,14 +51,10 @@ namespace Qwert.StaticObjectSync
             _originalGlobalRotation = transform.rotation;
             _originalLocalPosition = transform.localPosition;
             _originalLocalRotation = transform.localRotation;
-
-            UpdateTransformInfo();
         }
 
         private void UpdateCurrentContainerInfo()
         {
-            _previousContainer = _container;
-
             if (!Utilities.IsValid(transform.parent))
             {
                 _container = null;
@@ -99,16 +92,18 @@ namespace Qwert.StaticObjectSync
 
         public override void OnDeserialization(DeserializationResult result)
         {
-            var containerIsValid = Utilities.IsValid(_container);
-
-            if (_previousContainer != _container)
+            if (syncContainer)
             {
-                transform.SetParent(containerIsValid ? _container.transform : null);
-            }
-
-            if (containerIsValid)
-            {
-                LocallyTeleportToLocal(_localPosition, _localRotation);
+                if (Utilities.IsValid(_container))
+                {
+                    transform.SetParent(_container.transform);
+                    LocallyTeleportToLocal(_localPosition, _localRotation);
+                }
+                else
+                {
+                    transform.SetParent(null);
+                    LocallyTeleportToGlobal(_globalPosition, _globalRotation);
+                }
             }
             else
             {
