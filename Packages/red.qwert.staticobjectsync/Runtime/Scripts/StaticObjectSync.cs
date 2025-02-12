@@ -113,11 +113,10 @@ namespace Qwert.StaticObjectSync
             GloballyTeleportToGlobal(transform);
         }
 
-        private void LocallyRespawnToGlobal()
+        public void LocallyRespawnToGlobal()
         {
             transform.position = _originalGlobalPosition;
             transform.rotation = _originalGlobalRotation;
-            _hasBeenMoved = false;
         }
 
         public void GloballyRespawnToGlobal()
@@ -128,15 +127,15 @@ namespace Qwert.StaticObjectSync
             }
 
             LocallyRespawnToGlobal();
+            _hasBeenMoved = false;
             RequestSerialization();
         }
 
-        private void LocallyRespawnToLocal()
+        public void LocallyRespawnToLocal()
         {
             transform.SetParent(_originalParent);
             transform.localPosition = _originalLocalPosition;
             transform.localRotation = _originalLocalRotation;
-            _hasBeenMoved = false;
         }
 
         public void GloballyRespawnToLocal()
@@ -147,6 +146,7 @@ namespace Qwert.StaticObjectSync
             }
 
             LocallyRespawnToLocal();
+            _hasBeenMoved = false;
             RequestSerialization();
         }
 
