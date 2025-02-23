@@ -42,9 +42,6 @@ namespace Qwert.StaticObjectSync
             private set
             {
                 _hasBeenMoved = value;
-                Debug.Log(
-                    _hasBeenMoved ? "Has Been Moved" : "Has Not Been Moved"
-                );
             }
         }
 
