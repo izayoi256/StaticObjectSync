@@ -34,8 +34,16 @@ namespace Qwert.StaticObjectSync
         private StaticObjectContainer _previousContainer;
         private StaticObjectContainer _container;
 
-        [UdonSynced] private bool _hasBeenMoved;
-        public bool HasBeenMoved => _hasBeenMoved;
+        [UdonSynced, FieldChangeCallback(nameof(HasBeenMoved))] private bool _hasBeenMoved;
+
+        public bool HasBeenMoved
+        {
+            get => _hasBeenMoved;
+            private set
+            {
+                _hasBeenMoved = value;
+            }
+        }
 
         private Transform _originalParent;
         private Vector3 _originalGlobalPosition;
@@ -106,17 +114,19 @@ namespace Qwert.StaticObjectSync
 
             if (containerIsValid)
             {
-                LocallyTeleportToLocal(_localPosition, _localRotation);
+                transform.localPosition = _localPosition;
+                transform.localRotation = _localRotation;
             }
             else
             {
-                LocallyTeleportToGlobal(_globalPosition, _globalRotation);
+                transform.position = _globalPosition;
+                transform.rotation = _globalRotation;
             }
         }
 
         public override void OnPickup()
         {
-            _hasBeenMoved = true;
+            HasBeenMoved = true;
         }
 
         public override void OnDrop()
@@ -138,7 +148,7 @@ namespace Qwert.StaticObjectSync
             }
 
             LocallyRespawnToGlobal();
-            _hasBeenMoved = false;
+            HasBeenMoved = false;
             RequestSerialization();
         }
 
@@ -157,7 +167,7 @@ namespace Qwert.StaticObjectSync
             }
 
             LocallyRespawnToLocal();
-            _hasBeenMoved = false;
+            HasBeenMoved = false;
             RequestSerialization();
         }
 
@@ -206,7 +216,7 @@ namespace Qwert.StaticObjectSync
         {
             transform.position = position;
             transform.rotation = rotation;
-            _hasBeenMoved = true;
+            HasBeenMoved = true;
         }
 
         public void GloballyTeleportToLocal(Transform location) => GloballyTeleportToLocal(
@@ -254,7 +264,7 @@ namespace Qwert.StaticObjectSync
         {
             transform.localPosition = position;
             transform.localRotation = rotation;
-            _hasBeenMoved = true;
+            HasBeenMoved = true;
         }
 
         public void GloballySetParentContainer(StaticObjectContainer container)
