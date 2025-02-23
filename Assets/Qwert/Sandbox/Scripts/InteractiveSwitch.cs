@@ -130,5 +130,21 @@ namespace Qwert.Sandbox
                 }
             }
         }
+
+        public void Enable()
+        {
+            for (var i = 0; i < staticObjectSyncs.Length; i++)
+            {
+                staticObjectSyncs[i].gameObject.SetActive(true);
+            }
+        }
+
+        public void Disable()
+        {
+            for (var i = 0; i < staticObjectSyncs.Length; i++)
+            {
+                staticObjectSyncs[i].gameObject.SetActive(false);
+            }
+        }
     }
 }
