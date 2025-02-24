@@ -51,7 +51,9 @@ namespace Qwert.StaticObjectSync
 
                 if (Utilities.IsValid(_owner))
                 {
+                    _dropWhileSync = true;
                     _pickup.Drop(_owner);
+                    _dropWhileSync = false;
                 }
 
                 _ownerId = value;
@@ -65,11 +67,14 @@ namespace Qwert.StaticObjectSync
         public float RotationSmoothTime => rotationSmoothTime;
         private bool IsHeldGlobally => PickupHand != PickupHand.None;
 
+        private StaticObjectSync _sos;
         private VRCPickup _pickup;
         private ParentConstraint _constraint;
+        private bool _dropWhileSync;
 
         private void Start()
         {
+            _sos = GetComponent<StaticObjectSync>();
             _pickup = GetComponent<VRCPickup>();
             _constraint = GetComponent<ParentConstraint>();
             _constraint.enabled = false;
@@ -115,6 +120,11 @@ namespace Qwert.StaticObjectSync
         public override void OnPickup()
         {
             Unfollow();
+            if (Utilities.IsValid(_pickupGhost))
+            {
+                _pickupGhost.UnregisterFollower();
+            }
+
             OwnerId = Networking.LocalPlayer.playerId;
             _pickupHand = CurrentPickupHand();
             RequestSerialization();
@@ -133,6 +143,13 @@ namespace Qwert.StaticObjectSync
                 // _pickupHandの代入より前に処理
                 pickupManager.OnLocalDrop(this);
             }
+
+            if (_dropWhileSync)
+            {
+                return;
+            }
+
+            _sos.GloballyTeleportToGlobal(transform);
 
             _pickupHand = PickupHand.None;
             RequestSerialization();

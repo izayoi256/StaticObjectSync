@@ -129,11 +129,6 @@ namespace Qwert.StaticObjectSync
             HasBeenMoved = true;
         }
 
-        public override void OnDrop()
-        {
-            GloballyTeleportToGlobal(transform);
-        }
-
         public void LocallyRespawnToGlobal()
         {
             transform.position = _originalGlobalPosition;
