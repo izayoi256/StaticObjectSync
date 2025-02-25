@@ -50,6 +50,7 @@ namespace Qwert.StaticObjectSync
         private Quaternion _originalGlobalRotation;
         private Vector3 _originalLocalPosition;
         private Quaternion _originalLocalRotation;
+        private bool _locallyRespawned;
         private bool _disableNextSerialization;
         private int _requestSerializationCount;
 
@@ -92,10 +93,24 @@ namespace Qwert.StaticObjectSync
 
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
-            if (Networking.IsOwner(gameObject) && _hasBeenMoved)
+            if (!Networking.IsOwner(gameObject))
+            {
+                return;
+            }
+
+            if (_hasBeenMoved)
             {
                 RequestSerialization();
+                return;
             }
+
+            if (!_locallyRespawned)
+            {
+                return;
+            }
+
+            _locallyRespawned = false;
+            RequestSerialization();
         }
 
         public override void OnPreSerialization()
@@ -133,6 +148,8 @@ namespace Qwert.StaticObjectSync
         {
             transform.position = _originalGlobalPosition;
             transform.rotation = _originalGlobalRotation;
+            HasBeenMoved = false;
+            _locallyRespawned = true;
         }
 
         public void GloballyRespawnToGlobal()
@@ -142,8 +159,10 @@ namespace Qwert.StaticObjectSync
                 Networking.SetOwner(Networking.LocalPlayer, gameObject);
             }
 
-            LocallyRespawnToGlobal();
+            transform.position = _originalGlobalPosition;
+            transform.rotation = _originalGlobalRotation;
             HasBeenMoved = false;
+            _locallyRespawned = false;
             RequestSerialization();
         }
 
@@ -152,6 +171,8 @@ namespace Qwert.StaticObjectSync
             transform.SetParent(_originalParent);
             transform.localPosition = _originalLocalPosition;
             transform.localRotation = _originalLocalRotation;
+            HasBeenMoved = false;
+            _locallyRespawned = true;
         }
 
         public void GloballyRespawnToLocal()
@@ -161,8 +182,11 @@ namespace Qwert.StaticObjectSync
                 Networking.SetOwner(Networking.LocalPlayer, gameObject);
             }
 
-            LocallyRespawnToLocal();
+            transform.SetParent(_originalParent);
+            transform.localPosition = _originalLocalPosition;
+            transform.localRotation = _originalLocalRotation;
             HasBeenMoved = false;
+            _locallyRespawned = false;
             RequestSerialization();
         }
 
