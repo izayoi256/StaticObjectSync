@@ -67,16 +67,19 @@ namespace Qwert.StaticObjectSync
         public float RotationSmoothTime => rotationSmoothTime;
         private bool IsHeldGlobally => PickupHand != PickupHand.None;
 
-        private StaticObjectSync _sos;
-        private VRCPickup _pickup;
-        private ParentConstraint _constraint;
+        private StaticObjectSync __sos;
+        private StaticObjectSync _sos => Utilities.IsValid(__sos) ? __sos : __sos = GetComponent<StaticObjectSync>();
+
+        private VRCPickup __pickup;
+        private VRCPickup _pickup => Utilities.IsValid(__pickup) ? __pickup : __pickup = GetComponent<VRCPickup>();
+
+        private ParentConstraint __constraint;
+        private ParentConstraint _constraint => Utilities.IsValid(__constraint) ? __constraint : __constraint = GetComponent<ParentConstraint>();
+
         private bool _dropWhileSync;
 
         private void Start()
         {
-            _sos = GetComponent<StaticObjectSync>();
-            _pickup = GetComponent<VRCPickup>();
-            _constraint = GetComponent<ParentConstraint>();
             _constraint.enabled = false;
         }
 
