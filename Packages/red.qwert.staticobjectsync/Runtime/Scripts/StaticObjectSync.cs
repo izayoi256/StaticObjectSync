@@ -43,6 +43,7 @@ namespace Qwert.StaticObjectSync
             }
         }
 
+        private bool _originalTransformReset;
         private Transform _originalParent;
         private Vector3 _originalGlobalPosition;
         private Quaternion _originalGlobalRotation;
@@ -54,6 +55,15 @@ namespace Qwert.StaticObjectSync
 
         private void Start()
         {
+            if (!_originalTransformReset)
+            {
+                ResetOriginalTransform();
+            }
+        }
+
+        public void ResetOriginalTransform()
+        {
+            _originalTransformReset = true;
             _originalParent = transform.parent;
             _originalGlobalPosition = transform.position;
             _originalGlobalRotation = transform.rotation;
