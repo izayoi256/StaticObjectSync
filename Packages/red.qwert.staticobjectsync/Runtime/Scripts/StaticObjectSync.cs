@@ -37,11 +37,12 @@ namespace Qwert.StaticObjectSync
         public bool HasBeenMoved
         {
             get => _hasBeenMoved;
-            private set
-            {
-                _hasBeenMoved = value;
-            }
+            private set => _hasBeenMoved = value;
         }
+
+        public bool HasBeenSpatiallyMoved =>
+            transform.position != _originalGlobalPosition ||
+            transform.rotation != _originalGlobalRotation;
 
         private bool _originalTransformReset;
         private Transform _originalParent;
