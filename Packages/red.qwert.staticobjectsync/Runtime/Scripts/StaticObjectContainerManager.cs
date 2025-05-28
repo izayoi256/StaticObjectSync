@@ -31,7 +31,7 @@ namespace Qwert.StaticObjectSync
 
         public StaticObjectContainer Find(string containerId)
         {
-            if (!Utilities.IsValid(containerId))
+            if (!Utilities.IsValid(containerId) || !Utilities.IsValid(_staticObjectContainers))
             {
                 return null;
             }
