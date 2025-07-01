@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Random = UnityEngine.Random;
+using System;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -40,6 +41,8 @@ namespace Qwert.StaticObjectSync
             get => _hasBeenMoved;
             private set => _hasBeenMoved = value;
         }
+
+        [UdonSynced] private bool _detachFromParent;
 
         public bool HasBeenSpatiallyMoved =>
             transform.position != _originalGlobalPosition ||
@@ -124,8 +127,19 @@ namespace Qwert.StaticObjectSync
             UpdateTransformInfo();
         }
 
+        public override void OnPostSerialization(SerializationResult result)
+        {
+            _detachFromParent = false;
+        }
+
         public override void OnDeserialization(DeserializationResult result)
         {
+            if (_detachFromParent)
+            {
+                transform.SetParent(null);
+                _detachFromParent = false;
+            }
+
             if (syncContainer)
             {
                 if (Utilities.IsValid(_container))
@@ -303,6 +317,18 @@ namespace Qwert.StaticObjectSync
             }
 
             LocallySetParentContainer(container);
+            RequestSerialization();
+        }
+
+        public void GloballyDetachFromParent()
+        {
+            if (!Networking.IsOwner(gameObject))
+            {
+                Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            }
+
+            _detachFromParent = true;
+            transform.SetParent(null);
             RequestSerialization();
         }
 
