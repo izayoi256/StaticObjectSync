@@ -189,6 +189,8 @@ namespace Qwert.StaticObjectSync
                 return;
             }
 
+            Unfollow();
+
             var source = new ConstraintSource();
             source.sourceTransform = target;
             source.weight = 1.0f;
