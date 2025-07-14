@@ -46,7 +46,7 @@ namespace Qwert.StaticObjectSync
 
         public override void OnDeserialization()
         {
-            if (_enabled && Utilities.IsValid(_followerPickup) && !_followerPickup.IsFollowing())
+            if (_enabled && Utilities.IsValid(_followerPickup))
             {
                 if (_followerPickup.InterpolationMode == PickupInterpolationMode.None)
                 {
