@@ -91,6 +91,39 @@ namespace Qwert.StaticObjectSync
             }
         }
 
+        public override void OnPlayerLeft(VRCPlayerApi player)
+        {
+            if (Networking.IsMaster)
+            {
+                if (WasPickedUpByLeftPlayer(player))
+                {
+                    RespawnOnPlayerLeft();
+                }
+            }
+        }
+
+        private bool WasPickedUpByLeftPlayer(VRCPlayerApi leftPlayer)
+        {
+            if (!Utilities.IsValid(leftPlayer))
+            {
+                return false;
+            }
+
+            return IsHeldGlobally && leftPlayer.playerId == OwnerId;
+        }
+
+        public void RespawnOnPlayerLeft()
+        {
+            if (!Networking.IsOwner(gameObject))
+            {
+                Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            }
+
+            OnPickup();
+            OnDrop();
+            _sos.GloballyRespawnToGlobal();
+        }
+
         public override void OnDeserialization()
         {
             if (_pickupHand == PickupHand.None)
